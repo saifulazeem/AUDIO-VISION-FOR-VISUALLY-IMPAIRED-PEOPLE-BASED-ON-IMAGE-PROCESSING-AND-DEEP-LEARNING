@@ -37,7 +37,7 @@ DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 PATH_TO_FROZEN_GRAPH = MODEL_NAME + '/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('C:/flask_work/projects/objectdet/TensorFlow/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
+PATH_TO_LABELS = os.path.join('F:/FYP/flask_work/projects/objectdet/TensorFlow/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
 opener = urllib.request.URLopener()
 opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
 tar_file = tarfile.open(MODEL_FILE)
@@ -52,13 +52,16 @@ with detection_graph.as_default():
     serialized_graph = fid.read()
     od_graph_def.ParseFromString(serialized_graph)
     tf.import_graph_def(od_graph_def, name='')
-category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
-def load_image_into_numpy_array(image):
-  (im_width, im_height) = image.size
-  return np.array(image.getdata()).reshape(
-      (im_height, im_width, 3)).astype(np.uint8)
 
-def obj_det():
+def Detect_objects():
+
+  category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+  def load_image_into_numpy_array(image):
+    (im_width, im_height) = image.size
+    return np.array(image.getdata()).reshape(
+        (im_height, im_width, 3)).astype(np.uint8)
+
+
 
   import pathlib
 
@@ -67,12 +70,12 @@ def obj_det():
   # image2.jpg
   # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
   PATH_TO_TEST_IMAGES_DIR = pathlib.Path(
-    'C:/flask_work/projects/')
+    'F:/FYP/flask_work/projects/')
 
   TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.jpg")))
 
   IMAGE_SIZE = (12, 8)
-  #now/TEST_IMAGE_PATHS
+  TEST_IMAGE_PATHS
 
   #import cv2, time
 
@@ -195,8 +198,8 @@ def obj_det():
   import cv2, time
 
   with detection_graph.as_default():
-      with tf.Session(graph=detection_graph) as sess:
-        sess.run(tf.global_variables_initializer())
+      with tf.compat.v1.Session(graph=detection_graph) as sess:
+        sess.run(tf.compat.v1.global_variables_initializer())
         img = 1
         for image_path in TEST_IMAGE_PATHS:
           image = Image.open(image_path)
@@ -236,7 +239,7 @@ def obj_det():
           # get objects name from image having score value greater then 50%)
           your_list = [category_index.get(value) for index, value in enumerate(classes[0]) if scores[0, index] > 0.4]
           name = [item['name'] for item in your_list]  # names of objects in image
-          #now/print(name)  # print out names i.e used in making decription
+          print(name)  # print out names i.e used in making decription
           var_len = len(
             name)  # lenght of objects , used while making description #this variable is used in description to tell number of objects
 
@@ -258,15 +261,15 @@ def obj_det():
               # middle_col = (xmin + xmax) / 2
               # print(middle_row,middle_col)
 
-          #now/print(coordinates_list)
-          #now/print(result)
-          #now/plt.figure(figsize=IMAGE_SIZE)
-          #now/plt.imshow(image_np)
-          #now/print(var_len)
+          print(coordinates_list)
+          print(result)
+          plt.figure(figsize=IMAGE_SIZE)
+          plt.imshow(image_np)
+          print(var_len)
 
         # copy paste this cell again
-  #now/print(result)
-  #now/print(name)
+  print(result)
+  print(name)
   zipped = zip(result, name)
   list(zipped)
 
@@ -276,15 +279,15 @@ def obj_det():
   for b, n in zip(result, name):
     if b >= [0.0] and b <= [4.0]:
       left_obj = "  the " + n + " is on left side of image"
-      #now/print(left_obj)
+      print(left_obj)
 
     elif b > [4.0] and b <= [8.0]:
       cen_obj = "  the " + n + " is on center side of image"
-      #now/print(cen_obj)
+      print(cen_obj)
 
     elif b > [8.0] and b <= [12.0]:
       right_obj = "  the " + n + " is on right side of image"
-      #now/print(right_obj)
+      print(right_obj)
 
     else:
       print(' ')
@@ -302,11 +305,11 @@ def obj_det():
           center_item_list.append(n)
       elif b > [8.0]  and b <= [12.0]:
            right_item_list.append(n)
-  #/now/print(left_item_list)
-  #/now/print(center_item_list)
-  #now/print(right_item_list)
+  print(left_item_list)
+  print(center_item_list)
+  print(right_item_list)
 
-  #now/print(name)
+  print(name)
 
 
   def getDuplicatesWithCount(name):
@@ -333,7 +336,7 @@ def obj_det():
     co_item = key, ' :: ', value
     total_obj_count.append(str(value) + ' are ' + str(key) + ', ')
 
-  #now/print(total_obj_count)
+  print(total_obj_count)
 
 
   # this is for counting deplicate object ob left side of image
@@ -359,9 +362,12 @@ def obj_det():
   left_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    left_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value>=2:#$
+      left_count_obj.append('few ' + str(key) + '')  # $
+    if value<2:#$
+      left_count_obj.append(str(value) + ' ' + str(key) + '') #$
 
-    #now/print(left_count_obj)
+    print(left_count_obj)
 
 
   # this is for counting deplicate object ob center side of image
@@ -387,9 +393,13 @@ def obj_det():
   center_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    center_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value>=2:#$
+      center_count_obj.append('few ' + str(key) + '')  # $
 
-    #now/print(center_count_obj)
+    if value < 2:  # $
+      center_count_obj.append(str(value) + ' ' + str(key) + '')  # $
+
+    print(center_count_obj)
 
 
   # this is for counting deplicate object ob right side of image
@@ -415,25 +425,67 @@ def obj_det():
   right_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    right_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value >= 2:  # $
+      right_count_obj.append('few ' + str(key) + '')  # $
 
-    #now/print(right_count_obj)
+    if value < 2:  # $
+      right_count_obj.append(str(value) + ' ' + str(key) + '')  # $
+
+    print(right_count_obj)
 
   if var_len == 0:
     a = 'there is no '
+    description=" I can not really describe the scene but it seems like " # $ if nothing is detected.
 
   elif var_len > 0:
     a = 'there are almost ' + str(var_len) + ' '
+    if right_count_obj!=0 and left_count_obj!=0 and center_count_obj!=0: #$
+
+      description=" I can see "+''.join(left_count_obj)+" at left side, "+''.join(center_count_obj)+" in the center and "+''.join(right_count_obj)\
+                  +" at the right side" #$ if image contain objects
+
+    elif right_count_obj==0 and left_count_obj!=0 and center_count_obj!=0: #$
+
+      description=" It seems like "+''.join(left_count_obj)+" at left side and"+''.join(center_count_obj)+" in the center " #$ if image contain objects #$
+
+    elif right_count_obj != 0 and left_count_obj == 0 and center_count_obj != 0:  # $
+
+      description = " It seems like "+''.join(center_count_obj)+" in the center and"+''.join(right_count_obj)\
+                  +" at the right side" #$ if image contain objects
+
+    elif right_count_obj != 0 and left_count_obj != 0 and center_count_obj == 0:  # $
+
+      description = " It seems like "+''.join(left_count_obj)+" at the left side and"+''.join(right_count_obj)\
+                  +" at the right side" #$ if image contain objects
+
+    elif right_count_obj == 0 and left_count_obj == 0 and center_count_obj != 0:  # $
+
+      description = " It look like "+''.join(center_count_obj)+" in the center" #$ if image contain objects
+
+    elif right_count_obj != 0 and left_count_obj == 0 and center_count_obj == 0:  # $
+
+      description = " It can see "+''.join(right_count_obj) + " at the right side"  # $ if image contain objects
+
+    elif right_count_obj == 0 and left_count_obj != 0 and center_count_obj == 0:  # $
+
+      description = " I can see "+''.join(center_count_obj) + " at the left side"  # $ if image contain objects
+
+
+
+
 
   des = " " + str(a) + " objects identified in given image, among them " + ''.join(
     total_obj_count) + " moreover " + ''.join(left_count_obj) + " at left side and, " + ''.join(
     center_count_obj) + ' are at center and  ' + ''.join(right_count_obj) + " are at right side of image"
   print(des)
-  return des
 
-obj_des=obj_det()
+  print(description)
 
-print(obj_des)
+  return description;
+
+obj1=Detect_objects()
+
+print(obj1)
 
 
 

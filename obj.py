@@ -37,7 +37,7 @@ DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 PATH_TO_FROZEN_GRAPH = MODEL_NAME + '/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('F:/FYP/flask_work/projects/objectdet/TensorFlow/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
+PATH_TO_LABELS = os.path.join('C:/flask_work/projects/objectdet/TensorFlow/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
 opener = urllib.request.URLopener()
 opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
 tar_file = tarfile.open(MODEL_FILE)
@@ -52,16 +52,13 @@ with detection_graph.as_default():
     serialized_graph = fid.read()
     od_graph_def.ParseFromString(serialized_graph)
     tf.import_graph_def(od_graph_def, name='')
+category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+def load_image_into_numpy_array(image):
+  (im_width, im_height) = image.size
+  return np.array(image.getdata()).reshape(
+      (im_height, im_width, 3)).astype(np.uint8)
 
-def Detect_objects():
-
-  category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
-  def load_image_into_numpy_array(image):
-    (im_width, im_height) = image.size
-    return np.array(image.getdata()).reshape(
-        (im_height, im_width, 3)).astype(np.uint8)
-
-
+def obj_det():
 
   import pathlib
 
@@ -70,12 +67,12 @@ def Detect_objects():
   # image2.jpg
   # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
   PATH_TO_TEST_IMAGES_DIR = pathlib.Path(
-    'F:/FYP/flask_work/projects/')
+    'C:/flask_work/projects/')
 
   TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.jpg")))
 
   IMAGE_SIZE = (12, 8)
-  TEST_IMAGE_PATHS
+  #now/TEST_IMAGE_PATHS
 
   #import cv2, time
 
@@ -198,8 +195,8 @@ def Detect_objects():
   import cv2, time
 
   with detection_graph.as_default():
-      with tf.compat.v1.Session(graph=detection_graph) as sess:
-        sess.run(tf.compat.v1.global_variables_initializer())
+      with tf.Session(graph=detection_graph) as sess:
+        sess.run(tf.global_variables_initializer())
         img = 1
         for image_path in TEST_IMAGE_PATHS:
           image = Image.open(image_path)
@@ -225,7 +222,7 @@ def Detect_objects():
             category_index,
             use_normalized_coordinates=True,
             line_thickness=8,
-            min_score_thresh=0.4)
+            min_score_thresh=0.3)
 
           # ymin = int((boxes[0][0][0]*image_height))
           # xmin = int((boxes[0][0][1]*image_width))
@@ -237,9 +234,9 @@ def Detect_objects():
           # cv2.imwrite(img_item, Result)
 
           # get objects name from image having score value greater then 50%)
-          your_list = [category_index.get(value) for index, value in enumerate(classes[0]) if scores[0, index] > 0.4]
+          your_list = [category_index.get(value) for index, value in enumerate(classes[0]) if scores[0, index] > 0.3]
           name = [item['name'] for item in your_list]  # names of objects in image
-          print(name)  # print out names i.e used in making decription
+          #now/print(name)  # print out names i.e used in making decription
           var_len = len(
             name)  # lenght of objects , used while making description #this variable is used in description to tell number of objects
 
@@ -248,7 +245,7 @@ def Detect_objects():
           result = []
           counter_for = 0
           for i, b in enumerate(boxes[0]):
-            if scores[0, i] > 0.4:
+            if scores[0, i] > 0.3:
               ymin = int((boxes[0][i][0] * im_height))  # top
               xmin = int((boxes[0][i][1] * im_width))  # left
               ymax = int((boxes[0][i][2] * im_height))  # bottom
@@ -261,15 +258,147 @@ def Detect_objects():
               # middle_col = (xmin + xmax) / 2
               # print(middle_row,middle_col)
 
-          print(coordinates_list)
-          print(result)
-          plt.figure(figsize=IMAGE_SIZE)
-          plt.imshow(image_np)
-          print(var_len)
+          #now/print(coordinates_list)
+          #now/print(result)
+          #now/plt.figure(figsize=IMAGE_SIZE)
+          #now/plt.imshow(image_np)
+          #now/print(var_len)
 
         # copy paste this cell again
-  print(result)
-  print(name)
+  #RelationShip Module Integration
+  # # new chunk implement relation with comparing every coordinate box with each other
+  # # next code cell is alos its part (a)
+  # class Solution(object):
+  #   def isRectangleOverlap(self, rec1, rec2):
+  #     if (rec1[2] <= rec2[0]):
+  #       print(n + " beside " + m)
+  #       praposition=n + " beside " + m
+  #       return praposition
+  #
+  #     elif (rec1[3] <= rec2[1]):
+  #       print(n + " is below" + m)
+  #       praposiation=n + " is below" + m
+  #       return praposiation
+  #
+  #     elif (rec1[0] >= rec2[2]):
+  #       print(n + " beside " + m)
+  #       praposiation=n + " beside " + m
+  #       return praposiation
+  #
+  #
+  #     elif (rec1[1] >= rec2[3]):
+  #       print(n + " is above  " + m)
+  #       praposiation = n + " is above" + m
+  #       return praposiation
+  #
+  #
+  #     else:
+  #       print(n + " in front of " + m)
+  #       praposiation = n + " in front of " + m
+  #       return praposiation
+  #
+  # ##new chunk related to relation comparing each boz part (b)
+  # print(coordinates_list)
+  # print(name)
+  #
+  # for i, n in zip(coordinates_list, name):
+  #   rec1 = i
+  #   # print(rec1)
+  #   for j, m in zip(coordinates_list, name):
+  #     if (i == j):
+  #       print("Cant Identify Relationship")
+  #       #rec2 =! j
+  #
+  #     else:
+  #       rec2 = j
+  #
+  #       p = n + " and " + m
+  #       p2 = n
+  #       p3 = m
+  #       # print(p)
+  #       x = Solution()
+  #       x.isRectangleOverlap(rec1, rec2)
+
+  # new chunk to find mid point. and find out relation ith respect  to that central coordinate
+  # part(a)
+  midd_point_list = []
+
+  def findMiddle(coordinates_list):
+    if len(coordinates_list)>0:
+      middle = float(len(coordinates_list)) / 2
+      if middle % 2 != 0:
+        mid = coordinates_list[int(middle - .5)]
+        midd_point_list.append(mid)
+        return mid
+      else:
+        mid = (coordinates_list[int(middle)])
+        midd_point_list.append(mid)
+        return mid
+    else:
+      return "No RelationShip Found"
+
+  findMiddle(coordinates_list)
+
+  # new chunk
+  # part(b)
+  class Solution(object):
+    def isRectangleOverlap(self, rec1, rec2):
+      if (rec1[2] <= rec2[0]):
+        print(n + " beside " + m)
+        prep = n + " beside " + m
+        return prep
+
+      elif (rec1[3] <= rec2[1]):
+        print(n + " is below" + m)
+        prep = n + " is below" + m
+        return prep
+
+      elif (rec1[0] >= rec2[2]):
+        print(n + " beside " + m)
+        prep = n + " beside " + m
+        return prep
+
+      elif (rec1[1] >= rec2[3]):
+        print(n + " is above  " + m)
+        prep = n + " is above  " + m
+        return prep
+
+      else:
+        print(n + " in front of " + m)
+        prep = n + " in front of " + m
+        return prep
+
+  # part(c)
+  relationshhip_list = []
+  for i, n in zip(midd_point_list, name):
+    rec1 = i
+    # print(rec1)
+    for j, m in zip(coordinates_list, name):
+      if (i == j):
+        print("Cant Identify Relationship")
+        #rec2 != j
+      else:
+        rec2 = j
+
+        p = n + " and " + m
+        p2 = n
+        p3 = m
+        # print(p)
+        x = Solution()
+        rslt= x.isRectangleOverlap(rec1, rec2)
+        relationshhip_list.append(rslt)
+
+
+
+        # from here go to last code cell "decription "
+  #RelationShip Integration Ends Here..
+
+  #now/print(result)
+  #now/print(name)
+  print("Rel_list",relationshhip_list)
+  if len(relationshhip_list==0):
+    rslt="No RelationShip is Identified"
+    relationshhip_list.append(rslt)
   zipped = zip(result, name)
   list(zipped)
 
@@ -279,15 +408,15 @@ def Detect_objects():
   for b, n in zip(result, name):
     if b >= [0.0] and b <= [4.0]:
       left_obj = "  the " + n + " is on left side of image"
-      print(left_obj)
+      #now/print(left_obj)
 
     elif b > [4.0] and b <= [8.0]:
       cen_obj = "  the " + n + " is on center side of image"
-      print(cen_obj)
+      #now/print(cen_obj)
 
     elif b > [8.0] and b <= [12.0]:
       right_obj = "  the " + n + " is on right side of image"
-      print(right_obj)
+      #now/print(right_obj)
 
     else:
       print(' ')
@@ -305,11 +434,11 @@ def Detect_objects():
           center_item_list.append(n)
       elif b > [8.0]  and b <= [12.0]:
            right_item_list.append(n)
-  print(left_item_list)
-  print(center_item_list)
-  print(right_item_list)
+  #/now/print(left_item_list)
+  #/now/print(center_item_list)
+  #now/print(right_item_list)
 
-  print(name)
+  #now/print(name)
 
 
   def getDuplicatesWithCount(name):
@@ -336,7 +465,7 @@ def Detect_objects():
     co_item = key, ' :: ', value
     total_obj_count.append(str(value) + ' are ' + str(key) + ', ')
 
-  print(total_obj_count)
+  #now/print(total_obj_count)
 
 
   # this is for counting deplicate object ob left side of image
@@ -362,12 +491,9 @@ def Detect_objects():
   left_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    if value>=2:#$
-      left_count_obj.append('few ' + str(key) + '')  # $
-    if value<2:#$
-      left_count_obj.append(str(value) + ' ' + str(key) + '') #$
+    left_count_obj.append(str(value) + ' ' + str(key) + '')
 
-    print(left_count_obj)
+    #now/print(left_count_obj)
 
 
   # this is for counting deplicate object ob center side of image
@@ -393,13 +519,9 @@ def Detect_objects():
   center_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    if value>=2:#$
-      center_count_obj.append('few ' + str(key) + '')  # $
+    center_count_obj.append(str(value) + ' ' + str(key) + '')
 
-    if value < 2:  # $
-      center_count_obj.append(str(value) + ' ' + str(key) + '')  # $
-
-    print(center_count_obj)
+    #now/print(center_count_obj)
 
 
   # this is for counting deplicate object ob right side of image
@@ -425,67 +547,26 @@ def Detect_objects():
   right_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    if value >= 2:  # $
-      right_count_obj.append('few ' + str(key) + '')  # $
+    right_count_obj.append(str(value) + ' ' + str(key) + '')
 
-    if value < 2:  # $
-      right_count_obj.append(str(value) + ' ' + str(key) + '')  # $
-
-    print(right_count_obj)
+    #now/print(right_count_obj)
 
   if var_len == 0:
     a = 'there is no '
-    description=" I can not really describe the scene but it seems like " # $ if nothing is detected.
 
   elif var_len > 0:
     a = 'there are almost ' + str(var_len) + ' '
-    if right_count_obj!=0 and left_count_obj!=0 and center_count_obj!=0: #$
-
-      description=" I can see "+''.join(left_count_obj)+" at left side, "+''.join(center_count_obj)+" in the center and "+''.join(right_count_obj)\
-                  +" at the right side" #$ if image contain objects
-
-    elif right_count_obj==0 and left_count_obj!=0 and center_count_obj!=0: #$
-
-      description=" It seems like "+''.join(left_count_obj)+" at left side and"+''.join(center_count_obj)+" in the center " #$ if image contain objects #$
-
-    elif right_count_obj != 0 and left_count_obj == 0 and center_count_obj != 0:  # $
-
-      description = " It seems like "+''.join(center_count_obj)+" in the center and"+''.join(right_count_obj)\
-                  +" at the right side" #$ if image contain objects
-
-    elif right_count_obj != 0 and left_count_obj != 0 and center_count_obj == 0:  # $
-
-      description = " It seems like "+''.join(left_count_obj)+" at the left side and"+''.join(right_count_obj)\
-                  +" at the right side" #$ if image contain objects
-
-    elif right_count_obj == 0 and left_count_obj == 0 and center_count_obj != 0:  # $
-
-      description = " It look like "+''.join(center_count_obj)+" in the center" #$ if image contain objects
-
-    elif right_count_obj != 0 and left_count_obj == 0 and center_count_obj == 0:  # $
-
-      description = " It can see "+''.join(right_count_obj) + " at the right side"  # $ if image contain objects
-
-    elif right_count_obj == 0 and left_count_obj != 0 and center_count_obj == 0:  # $
-
-      description = " I can see "+''.join(center_count_obj) + " at the left side"  # $ if image contain objects
-
-
-
-
 
   des = " " + str(a) + " objects identified in given image, among them " + ''.join(
     total_obj_count) + " moreover " + ''.join(left_count_obj) + " at left side and, " + ''.join(
-    center_count_obj) + ' are at center and  ' + ''.join(right_count_obj) + " are at right side of image"
+    center_count_obj) + ' are at center and  ' + ''.join(right_count_obj) + " are at right side of image Now The Relationshipes between" \
+                                                                            " objects are "+str(relationshhip_list)
   print(des)
+  return des
 
-  print(description)
+obj_des=obj_det()
 
-  return description;
-
-obj1=Detect_objects()
-
-print(obj1)
+print(obj_des)
 
 
 

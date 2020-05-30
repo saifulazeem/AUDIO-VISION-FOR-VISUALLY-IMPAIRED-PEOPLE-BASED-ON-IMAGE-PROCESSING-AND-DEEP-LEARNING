@@ -491,7 +491,11 @@ def obj_det():
   left_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    left_count_obj.append(str(value) + ' ' + str(key) + '')
+    #left_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value >= 2:  # $
+      left_count_obj.append('few ' + str(key) + '')  # $
+    if value < 2:  # $
+      left_count_obj.append(str(value) + ' ' + str(key) + '')  # $
 
     #now/print(left_count_obj)
 
@@ -519,7 +523,13 @@ def obj_det():
   center_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    center_count_obj.append(str(value) + ' ' + str(key) + '')
+    #center_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value >= 2:  # $
+      center_count_obj.append('few ' + str(key) + '')  # $
+
+      # now/print(center_count_obj)
+    if value < 2:  # $
+      center_count_obj.append(str(value) + ' ' + str(key) + '')  # $
 
     #now/print(center_count_obj)
 
@@ -547,22 +557,62 @@ def obj_det():
   right_count_obj = []
   for key, value in dictOfElems.items():
     co_item = key, ' :: ', value
-    right_count_obj.append(str(value) + ' ' + str(key) + '')
+    #right_count_obj.append(str(value) + ' ' + str(key) + '')
+    if value >= 2:  # $
+      right_count_obj.append('few ' + str(key) + '')  # $
+
+    if value < 2:  # $
+      right_count_obj.append(str(value) + ' ' + str(key) + '')
 
     #now/print(right_count_obj)
 
   if var_len == 0:
     a = 'there is no '
+    description = " I can not really describe the scene but it seems like "  # $ if nothing is detected.
+
 
   elif var_len > 0:
     a = 'there are almost ' + str(var_len) + ' '
+    if len(right_count_obj) != 0 and len(left_count_obj) != 0 and len(center_count_obj) != 0:  # $
+
+      description = " I can see " + ''.join(left_count_obj) + " at left side, " + ''.join(
+        center_count_obj) + " in the center and " + ''.join(right_count_obj) \
+                    + " at the right side."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
+
+    elif len(right_count_obj) == 0 and len(left_count_obj) != 0 and len(center_count_obj) != 0:  # $
+
+      description = " It seems like " + ''.join(left_count_obj) + " at left side and" + ''.join(
+        center_count_obj) + " in the center."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects #$
+
+    elif len(right_count_obj) != 0 and len(left_count_obj) == 0 and len(center_count_obj) != 0:  # $
+
+      description = " It seems like " + ''.join(center_count_obj) + " in the center and" + ''.join(right_count_obj) \
+                    + " at the right side."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
+
+    elif len(right_count_obj) != 0 and len(left_count_obj) != 0 and len(center_count_obj) == 0:  # $
+
+      description = " It seems like " + ''.join(left_count_obj) + " at the left side and" + ''.join(right_count_obj) \
+                    + " at the right side."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
+
+    elif len(right_count_obj) == 0 and len(left_count_obj) == 0 and len(center_count_obj) != 0:  # $
+
+      description = " It look like " + ''.join(center_count_obj) + " in the center."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
+
+    elif len(right_count_obj) != 0 and len(left_count_obj) == 0 and len(center_count_obj) == 0:  # $
+
+      description = " It can see " + ''.join(right_count_obj) + " at the right side."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
+
+    elif len(right_count_obj) == 0 and len(left_count_obj) != 0 and len(center_count_obj) == 0:  # $
+
+      description = " I can see " + ''.join(center_count_obj) + " at the left side."+" The Relationship between objects are "+str(relationshhip_list)  # $ if image contain objects
 
   des = " " + str(a) + " objects identified in given image, among them " + ''.join(
     total_obj_count) + " moreover " + ''.join(left_count_obj) + " at left side and, " + ''.join(
     center_count_obj) + ' are at center and  ' + ''.join(right_count_obj) + " are at right side of image Now The Relationshipes between" \
                                                                             " objects are "+str(relationshhip_list)
   print(des)
-  return des
+  print(description)
+  return description
 
 obj_des=obj_det()
 
